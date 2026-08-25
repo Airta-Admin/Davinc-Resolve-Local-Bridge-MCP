@@ -11,14 +11,14 @@
 </p>
 
 <p align="center">
-  <strong>215 tools. Full API coverage. Works with DaVinci Resolve Free and Studio.</strong>
+  <strong>218 tools. Resolve API and optional-extension coverage. Works with DaVinci Resolve Free and Studio.</strong>
 </p>
 
 ---
 
 ## What Is This?
 
-**Davinc-Resolve-Local-Bridge-MCP** is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that gives AI assistants full control over DaVinci Resolve. It exposes **215 tools** covering the entire Resolve scripting API — projects, timelines, media, Fusion, color grading, rendering, and more.
+**Davinc-Resolve-Local-Bridge-MCP** is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that gives AI assistants controlled access to DaVinci Resolve. It exposes **218 tools** covering projects, timelines, media, Fusion, color grading, rendering, and supported optional extensions.
 
 ### How It Works
 
@@ -31,7 +31,7 @@ Your AI Assistant (Claude, Cursor, Devin, etc.)
        │
        │  talks HTTP (localhost:8787)
        ▼
-  Bridge-Connection-Script.py ← runs INSIDE DaVinci Resolve
+  DaVinciResolveBridge.py ← runs INSIDE DaVinci Resolve
        │                        (Workspace > Scripts menu)
        ▼
   DaVinci Resolve API         ← full read + write access
@@ -57,11 +57,11 @@ Run the installer:
 python install.py
 ```
 
-Or manually copy `bridge/Bridge-Connection-Script.py` to Resolve's scripts folder:
+Or manually copy `bridge/Bridge-Connection-Script.py` to Resolve's scripts folder as `DaVinciResolveBridge.py`:
 
 | Platform | Path |
 |----------|------|
-| **Windows** | `%APPDATA%\Roaming\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\` |
+| **Windows** | `%APPDATA%\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\` |
 | **macOS** | `~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/` |
 | **Linux** | `~/.local/share/DaVinciResolve/Fusion/Scripts/Utility/` |
 
@@ -137,13 +137,13 @@ python mcp_server/server.py
 ### Step 4 — Start the Bridge Inside DaVinci Resolve
 
 1. **Open DaVinci Resolve**
-2. Go to **Workspace → Scripts → Bridge-Connection-Script**
+2. Go to **Workspace → Scripts → DaVinciResolveBridge**
 3. Look in the **Console** (Workspace → Console) for:
 
 ```
 [Resolve Bridge] Connected to Resolve 21.0.4.5
 [Resolve Bridge] HTTP server running on http://127.0.0.1:8787
-[Resolve Bridge] 215 actions available
+[Resolve Bridge] 218 actions available
 ```
 
 ### Step 5 — Start Using It
@@ -178,14 +178,14 @@ A Python script that runs **inside** DaVinci Resolve via the Workspace > Scripts
 A standalone MCP server that:
 
 - Connects to the bridge over HTTP on localhost
-- Auto-discovers all 215 actions from the bridge's `/actions` endpoint
+- Auto-discovers all 218 actions from the bridge's `/actions` endpoint
 - Exposes each action as an MCP tool with the `resolve_` prefix
 - Proxies tool calls to the bridge via `POST /action`
 - Stays in sync with the bridge — no manual tool definitions needed
 
 ---
 
-## All 215 Tools
+## All 218 Tools
 
 The MCP server auto-discovers tools from the bridge. Each tool is prefixed with `resolve_` (e.g., `status` becomes `resolve_status`). Pass parameters as a `params` object.
 
@@ -503,7 +503,7 @@ OpenCaptions and Rembg-Fuse are independent third-party projects and are not bun
 
 ### "Could not connect to Resolve Bridge"
 
-- Make sure you ran **Workspace → Scripts → Bridge-Connection-Script** inside Resolve
+- Make sure you ran **Workspace → Scripts → DaVinciResolveBridge** inside Resolve
 - Check that the console shows `[Resolve Bridge] HTTP server running on http://127.0.0.1:8787`
 - If the port is already in use, close Resolve and reopen it (stale `fuscript.exe` processes can hold the port)
 

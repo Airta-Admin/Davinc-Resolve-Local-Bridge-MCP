@@ -8,7 +8,7 @@ Architecture:
     Agent <--MCP--> This Server <--HTTP--> Resolve Bridge (inside Resolve) <--Resolve API--> DaVinci Resolve
 
 The Resolve Bridge script must be running inside DaVinci Resolve first:
-    Workspace > Scripts > Bridge-Connection-Script
+    Workspace > Scripts > DaVinciResolveBridge
 
 Usage:
     python -m resolve_mcp.server          # stdio transport (default)
@@ -98,7 +98,7 @@ logger.info(f"MCP SDK version: {_mcp_version} (major={_mcp_major}, v2={_IS_MCP_V
 # Any action not listed here gets a generic description.
 
 ACTION_DESCRIPTIONS = {
-    "status": "Check if DaVinci Resolve bridge is running and get current project/timeline info. Always call this first to verify connectivity. The bridge script must be running inside Resolve via Workspace > Scripts > Bridge-Connection-Script.",
+    "status": "Check if DaVinci Resolve bridge is running and get current project/timeline info. Always call this first to verify connectivity. The bridge script must be running inside Resolve via Workspace > Scripts > DaVinciResolveBridge.",
     "get_version": "Get DaVinci Resolve version information.",
     "get_current_page": "Get the currently active page in DaVinci Resolve.",
     "open_page": "Switch to a specific page in DaVinci Resolve. Pages: edit, fusion, color, deliver, media, cut, fairlight.",
@@ -165,7 +165,7 @@ def _build_tools():
         tools.append(Tool(
             name="resolve_health",
             description="Check if DaVinci Resolve bridge is running. The bridge script must be "
-                        "running inside Resolve via Workspace > Scripts > Bridge-Connection-Script. "
+                        "running inside Resolve via Workspace > Scripts > DaVinciResolveBridge. "
                         "If this returns an error, the bridge is not running.",
             inputSchema={"type": "object", "properties": {}, "required": []},
         ))
@@ -228,7 +228,7 @@ async def _handle_call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=json.dumps({
             "status": "error",
             "message": "Could not connect to Resolve Bridge. Make sure the bridge script is running "
-                       "inside DaVinci Resolve via Workspace > Scripts > Bridge-Connection-Script",
+                       "inside DaVinci Resolve via Workspace > Scripts > DaVinciResolveBridge",
         }))]
     except Exception as e:
         return [TextContent(type="text", text=json.dumps({"status": "error", "message": str(e)}))]

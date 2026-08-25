@@ -10,13 +10,14 @@ import os
 import sys
 import shutil
 import platform
+from datetime import datetime
 
 def get_resolve_scripts_dir():
     """Get the DaVinci Resolve scripts directory for this platform."""
     system = platform.system()
     if system == "Windows":
         base = os.environ.get("APPDATA", os.path.expanduser("~"))
-        return os.path.join(base, "Roaming", "Blackmagic Design",
+        return os.path.join(base, "Blackmagic Design",
                           "DaVinci Resolve", "Support", "Fusion", "Scripts", "Utility")
     elif system == "Darwin":
         return os.path.expanduser("~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility")
@@ -43,7 +44,12 @@ def main():
     print(f"  Source: {bridge_src}")
 
     if os.path.exists(scripts_dir):
-        dest = os.path.join(scripts_dir, "Bridge-Connection-Script.py")
+        dest = os.path.join(scripts_dir, "DaVinciResolveBridge.py")
+        if os.path.exists(dest):
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            backup = f"{dest}.backup-{stamp}"
+            shutil.copy2(dest, backup)
+            print(f"  Backed up existing bridge to: {backup}")
         shutil.copy2(bridge_src, dest)
         print(f"  Copied to: {dest}")
         print("  OK!")
@@ -96,7 +102,7 @@ def main():
     # Step 4: Instructions
     print("Step 4: Start the bridge inside DaVinci Resolve")
     print("  1. Open DaVinci Resolve")
-    print("  2. Go to Workspace > Scripts > Bridge-Connection-Script")
+    print("  2. Go to Workspace > Scripts > DaVinciResolveBridge")
     print("  3. You should see '[Resolve Bridge] HTTP server running on http://127.0.0.1:8787'")
     print()
     print("Done! Your AI assistant can now control DaVinci Resolve.")
