@@ -504,7 +504,7 @@ OpenCaptions and Rembg-Fuse are independent third-party projects and are not bun
 
 <p align="center">
   <a href="https://buy.stripe.com/9B6eVd3vP3Et5465MI7bW05">
-    <img src="workflow/assets/tip-jar.png" alt="Tip jar" width="150">
+    <img src="https://raw.githubusercontent.com/Airta-Admin/Davinc-Resolve-Local-Bridge-MCP/main/workflow/assets/tip-jar.png" alt="Tip jar" width="150">
   </a>
 </p>
 
