@@ -3,6 +3,7 @@
 import json
 import os
 import runpy
+import sys
 import threading
 import urllib.request
 import webbrowser
@@ -13,6 +14,25 @@ PORT = 8787
 BASE_URL = "http://%s:%d" % (HOST, PORT)
 WINDOW_ID = "io.github.resolve.local.bridge.mcp.connection"
 TIP_URL = "https://buy.stripe.com/9B6eVd3vP3Et5465MI7bW05"
+
+
+def _tip_icon_path():
+    """Resolve's Workflow Integration runtime may not define __file__."""
+    candidates = []
+    script_file = globals().get("__file__")
+    if script_file:
+        candidates.append(os.path.join(os.path.dirname(os.path.abspath(script_file)), "assets", "tip-jar.png"))
+    if sys.argv and sys.argv[0]:
+        candidates.append(os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), "assets", "tip-jar.png"))
+    candidates.append(os.path.join(
+        os.environ.get("PROGRAMDATA", "C:\\ProgramData"),
+        "Blackmagic Design", "DaVinci Resolve", "Support",
+        "Workflow Integration Plugins", "assets", "tip-jar.png",
+    ))
+    for path in candidates:
+        if os.path.isfile(path):
+            return path
+    return candidates[-1]
 
 
 def _bridge_path():
@@ -85,7 +105,7 @@ else:
                 ui.Button({
                     "ID": "TipButton",
                     "Text": "$5 Developer Tip",
-                    "Icon": ui.Icon({"File": os.path.join(os.path.dirname(__file__), "assets", "tip-jar.png")}),
+                    "Icon": ui.Icon({"File": _tip_icon_path()}),
                     "IconSize": [72, 72],
                     "ToolTip": "Open secure Stripe checkout for an optional one-time $5 developer tip",
                 }),
