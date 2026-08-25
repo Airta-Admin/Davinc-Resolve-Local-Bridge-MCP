@@ -4,7 +4,7 @@ import json
 import os
 import runpy
 import sys
-import threading
+import traceback
 import urllib.request
 import webbrowser
 
@@ -63,7 +63,20 @@ def _launch_bridge():
     path = _bridge_path()
     if not os.path.isfile(path):
         raise RuntimeError("Bridge script not found: " + path)
-    runpy.run_path(path, run_name="__davinci_resolve_local_bridge__")
+    host_resolve = fusion.GetResolve()
+    if not host_resolve:
+        raise RuntimeError("Workflow Integration could not obtain the live Resolve object")
+    runpy.run_path(
+        path,
+        run_name="__davinci_resolve_local_bridge__",
+        init_globals={
+            "fusion": fusion,
+            "fu": fusion,
+            "resolve": host_resolve,
+            "bmd": bmd,
+            "RESOLVE_BRIDGE_BACKGROUND": True,
+        },
+    )
 
 
 try:
@@ -119,9 +132,22 @@ else:
         win.Find("Status").Text = _status_text()
 
     def start(_event=None):
-        if _status_text() == "Stopped":
-            threading.Thread(target=_launch_bridge, name="DaVinciResolveLocalBridge", daemon=True).start()
+        status = _status_text()
+        if status != "Stopped":
+            win.Find("Status").Text = status
+            return
         win.Find("Status").Text = "Starting..."
+        try:
+            _launch_bridge()
+            status = _status_text()
+            if status == "Stopped":
+                raise RuntimeError("Bridge script returned but the health endpoint did not respond")
+            win.Find("Status").Text = status
+        except Exception as error:
+            message = "Start failed: %s" % error
+            win.Find("Status").Text = message
+            print("[Resolve Bridge Launcher] " + message)
+            traceback.print_exc()
 
     def stop(_event=None):
         try:

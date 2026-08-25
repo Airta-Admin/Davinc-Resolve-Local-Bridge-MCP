@@ -21,6 +21,12 @@ import traceback
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
+# Workflow Integrations can inject the live Resolve/Fusion objects before this
+# script initializes its own module globals.
+_host_resolve = globals().get("resolve")
+_host_fusion = globals().get("fusion") or globals().get("fu")
+_background_server = bool(globals().get("RESOLVE_BRIDGE_BACKGROUND", False))
+
 # ── Resolve connection (uses the same pattern as Resolve's example scripts) ──
 
 def _load_resolve_module():
@@ -60,6 +66,8 @@ def _connect():
     global resolve, fusion, project_manager, project
     # Try Fusion globals first (available when run from Workspace > Scripts)
     for attempt in (
+        lambda: _host_resolve,
+        lambda: _host_fusion.GetResolve(),
         lambda: fu.GetResolve(),           # noqa: F821
         lambda: fusion.GetResolve(),        # noqa: F821
         lambda: bmd.scriptapp("Resolve"),   # noqa: F821
@@ -2365,7 +2373,14 @@ def start_server():
     print("[Resolve Bridge] HTTP server running on http://%s:%d" % (HOST, PORT))
     print("[Resolve Bridge] %d actions available" % len(ACTIONS))
     print("[Resolve Bridge] Test with: curl http://%s:%d/health" % (HOST, PORT))
-    # Block here so the server stays alive
+    if _background_server:
+        threading.Thread(
+            target=_server.serve_forever,
+            name="DaVinciResolveBridgeHTTP",
+            daemon=True,
+        ).start()
+        return True
+    # Scripts-menu fallback blocks here so the server stays alive.
     _server.serve_forever()
 
 # Auto-start when script is run
