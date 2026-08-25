@@ -32,7 +32,7 @@ Your AI Assistant (Claude, Cursor, Devin, etc.)
        │  talks HTTP (localhost:8787)
        ▼
   DaVinciResolveBridge.py ← runs INSIDE DaVinci Resolve
-       │                        (Workspace > Scripts menu)
+       │                        (started from the Workflow Integration)
        ▼
   DaVinci Resolve API         ← full read + write access
 ```
@@ -49,7 +49,7 @@ The bridge script runs **inside** DaVinci Resolve's process, giving it full acce
 - **Python 3.10+** on your machine
 - An MCP-compatible AI assistant (Claude Desktop, Cursor, Devin, etc.)
 
-### Step 1 — Install the Bridge Script
+### Step 1 — Install the Workflow Integration and Bridge
 
 Run the installer:
 
@@ -57,7 +57,9 @@ Run the installer:
 python install.py
 ```
 
-Or manually copy `bridge/Bridge-Connection-Script.py` to Resolve's scripts folder as `DaVinciResolveBridge.py`:
+The installer adds the user-facing launcher under **Workspace → Workflow Integrations** and installs the underlying bridge script. Restart Resolve once after installation so it discovers the integration.
+
+For a manual installation, copy `workflow/DaVinci Resolve Local Bridge MCP Server Connection.py` and the `workflow/assets` directory to Resolve's `Workflow Integration Plugins` directory. Also copy `bridge/Bridge-Connection-Script.py` to Resolve's scripts folder as `DaVinciResolveBridge.py`. The Scripts entry is retained as a fallback, not the normal launch path.
 
 | Platform | Path |
 |----------|------|
@@ -137,8 +139,9 @@ python mcp_server/server.py
 ### Step 4 — Start the Bridge Inside DaVinci Resolve
 
 1. **Open DaVinci Resolve**
-2. Go to **Workspace → Scripts → DaVinciResolveBridge**
-3. Look in the **Console** (Workspace → Console) for:
+2. Go to **Workspace → Workflow Integrations → DaVinci Resolve Local Bridge MCP Server Connection**
+3. Click **Start Bridge**
+4. Confirm that the panel reports **Running on http://127.0.0.1:8787 (218 actions)**. For diagnostic details, open **Workspace → Console** and look for:
 
 ```
 [Resolve Bridge] Connected to Resolve 21.0.4.5
@@ -162,7 +165,7 @@ The assistant will call the `resolve_status` tool and report back. Then try:
 
 ### Bridge Script (`bridge/Bridge-Connection-Script.py`)
 
-A Python script that runs **inside** DaVinci Resolve via the Workspace > Scripts menu. It:
+A Python script that runs **inside** DaVinci Resolve. The supported Workflow Integration launcher starts it for the user; **Workspace → Scripts → DaVinciResolveBridge** remains available only as a fallback. It:
 
 - Obtains the live `resolve` object from Fusion's globals
 - Starts an HTTP server on `127.0.0.1:8787`
@@ -515,12 +518,14 @@ OpenCaptions and Rembg-Fuse are independent third-party projects and are not bun
 ### Bridge won't start
 
 - Make sure DaVinci Resolve is running and a project is open
+- Open **Workspace → Workflow Integrations → DaVinci Resolve Local Bridge MCP Server Connection** and click **Start Bridge**
 - Check the Console (Workspace → Console) for error messages
-- Restart DaVinci Resolve — it only scans the Scripts folder at startup
+- Restart DaVinci Resolve after installation — it scans Workflow Integrations at startup
+- If the Workflow Integration cannot be opened, use **Workspace → Scripts → DaVinciResolveBridge** as a fallback and report the integration error
 
 ### "Could not connect to Resolve Bridge"
 
-- Make sure you ran **Workspace → Scripts → DaVinciResolveBridge** inside Resolve
+- Open **Workspace → Workflow Integrations → DaVinci Resolve Local Bridge MCP Server Connection** and verify that its status says **Running**
 - Check that the console shows `[Resolve Bridge] HTTP server running on http://127.0.0.1:8787`
 - If the port is already in use, close Resolve and reopen it (stale `fuscript.exe` processes can hold the port)
 

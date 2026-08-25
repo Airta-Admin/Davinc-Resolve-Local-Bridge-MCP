@@ -127,8 +127,10 @@ def main():
     # Step 4: Instructions
     print("Step 4: Start the bridge inside DaVinci Resolve")
     print("  1. Open DaVinci Resolve")
-    print("  2. Go to Workspace > Scripts > DaVinciResolveBridge")
-    print("  3. You should see '[Resolve Bridge] HTTP server running on http://127.0.0.1:8787'")
+    print("  2. Go to Workspace > Workflow Integrations > DaVinci Resolve Local Bridge MCP Server Connection")
+    print("  3. Click Start Bridge")
+    print("  4. Confirm the panel reports 'Running on http://127.0.0.1:8787'")
+    print("  Fallback only: Workspace > Scripts > DaVinciResolveBridge")
     print()
     print("Done! Your AI assistant can now control DaVinci Resolve.")
 
