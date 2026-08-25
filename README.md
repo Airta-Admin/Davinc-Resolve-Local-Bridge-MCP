@@ -3,7 +3,7 @@
 <!-- mcp-name: io.github.Airta-Admin/davinc-resolve-local-bridge-mcp -->
 
 <p align="center">
-  <img src="images/software-box.png" alt="DaVinci Resolve Local Bridge MCP" width="400">
+  <img src="https://raw.githubusercontent.com/Airta-Admin/Davinc-Resolve-Local-Bridge-MCP/main/images/software-box.png" alt="DaVinci Resolve Local Bridge MCP" width="400">
 </p>
 
 <p align="center">

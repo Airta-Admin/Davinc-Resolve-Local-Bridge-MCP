@@ -95,7 +95,7 @@ You should see:
 ```
 Publishing to https://registry.modelcontextprotocol.io...
 ✓ Successfully published
-✓ Server io.github.Airta-Admin/davinc-resolve-local-bridge-mcp version 1.2.3
+✓ Server io.github.Airta-Admin/davinc-resolve-local-bridge-mcp version 1.2.4
 ```
 
 ## Step 6 — Verify
