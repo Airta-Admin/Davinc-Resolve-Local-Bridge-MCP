@@ -30,7 +30,6 @@ from mcp.server.stdio import stdio_server
 from mcp.types import (
     Tool,
     TextContent,
-    ListToolsResult,
 )
 
 logger = logging.getLogger("davinc-resolve-local-bridge-mcp")
@@ -79,7 +78,20 @@ class ResolveBridgeClient:
 
 
 client = ResolveBridgeClient()
-server = Server("davinc-resolve-local-bridge-mcp")
+
+# ── Detect MCP SDK version ───────────────────────────────────────────────────
+# MCP 2.x removed the @server.list_tools() / @server.call_tool() decorators
+# from the low-level Server class and replaced them with on_* constructor params.
+# We detect which API is available and register handlers accordingly.
+
+import mcp as _mcp_module
+
+_mcp_version = getattr(_mcp_module, "__version__", "0.0.0")
+_mcp_major = int(_mcp_version.split(".")[0]) if _mcp_version != "0.0.0" else 1
+_IS_MCP_V2 = _mcp_major >= 2
+
+logger.info(f"MCP SDK version: {_mcp_version} (major={_mcp_major}, v2={_IS_MCP_V2})")
+
 
 # ── Tool descriptions for known actions ──────────────────────────────────────
 # Maps action names to human-readable descriptions for MCP tool definitions.
@@ -177,15 +189,21 @@ def _build_tools():
     return tools
 
 
-# ── MCP server handlers ──────────────────────────────────────────────────────
+# ── Shared handler logic ─────────────────────────────────────────────────────
 
-@server.list_tools()
-async def list_tools() -> ListToolsResult:
-    return ListToolsResult(tools=_build_tools())
+async def _handle_list_tools():
+    """Return the list of available tools. Works with both MCP 1.x and 2.x."""
+    tools = _build_tools()
+    # MCP 1.x expects ListToolsResult; MCP 2.x expects a bare list
+    if _IS_MCP_V2:
+        return tools
+    else:
+        from mcp.types import ListToolsResult
+        return ListToolsResult(tools=tools)
 
 
-@server.call_tool()
-async def call_tool(name: str, arguments: dict) -> list:
+async def _handle_call_tool(name: str, arguments: dict):
+    """Execute a tool call. Returns a list of TextContent."""
     try:
         # Convert tool name back to action name
         if name.startswith("resolve_"):
@@ -211,6 +229,28 @@ async def call_tool(name: str, arguments: dict) -> list:
         }))]
     except Exception as e:
         return [TextContent(type="text", text=json.dumps({"status": "error", "message": str(e)}))]
+
+
+# ── Register handlers with the Server ────────────────────────────────────────
+
+if _IS_MCP_V2:
+    # MCP 2.x: use on_* constructor params instead of decorators
+    server = Server(
+        "davinc-resolve-local-bridge-mcp",
+        list_tools_handler=_handle_list_tools,
+        call_tool_handler=_handle_call_tool,
+    )
+else:
+    # MCP 1.x: use decorators
+    server = Server("davinc-resolve-local-bridge-mcp")
+
+    @server.list_tools()
+    async def list_tools():
+        return await _handle_list_tools()
+
+    @server.call_tool()
+    async def call_tool(name: str, arguments: dict):
+        return await _handle_call_tool(name, arguments)
 
 
 # ── Entry point ──────────────────────────────────────────────────────────────
