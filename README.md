@@ -483,6 +483,16 @@ All item actions accept optional `trackType`, `trackIndex`, `itemIndex` to targe
 
 ---
 
+### Optional open-source extensions (3 tools)
+
+| MCP Tool | Description |
+|---|---|
+| `resolve_get_extension_status` | Read-only detection for OpenCaptions and Rembg-Fuse |
+| `resolve_open_captions_list_templates` | List caption Text+ templates in the current project |
+| `resolve_fusion_add_rembg_node` | Add an installed Rembg-Fuse node to the current Fusion comp |
+
+OpenCaptions and Rembg-Fuse are independent third-party projects and are not bundled with this package.
+
 ## Troubleshooting
 
 ### Bridge won't start

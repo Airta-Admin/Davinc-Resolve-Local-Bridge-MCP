@@ -132,6 +132,9 @@ ACTION_DESCRIPTIONS = {
     "fusion_get_input": "Get an input value from a Fusion node.",
     "fusion_get_tool_list": "List all tools/nodes in the current Fusion composition.",
     "fusion_set_current_frame": "Set the current frame in the Fusion composition.",
+    "get_extension_status": "Read-only check for supported optional Resolve extensions, currently OpenCaptions and Rembg-Fuse.",
+    "open_captions_list_templates": "List Text+ clips in the OpenCaptions 'Captions Templates' media-pool folder.",
+    "fusion_add_rembg_node": "Add the installed Rembg-Fuse background-removal node to the current Fusion composition.",
     "generate_speech": "Generate speech audio using DaVinci Resolve's AI speech generation.",
     "create_subtitles_from_audio": "Auto-generate subtitles from timeline audio.",
     "detect_scene_cuts": "Detect and create scene cuts along the timeline.",
@@ -261,6 +264,11 @@ async def main():
         await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
-if __name__ == "__main__":
+def run():
+    """Console-script entry point."""
     import asyncio
     asyncio.run(main())
+
+
+if __name__ == "__main__":
+    run()
