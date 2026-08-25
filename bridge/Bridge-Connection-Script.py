@@ -7,7 +7,7 @@ Run this script from inside DaVinci Resolve via:
 It starts an HTTP server on localhost:8787 inside the Resolve process,
 giving external agents (Devin) direct access to the Resolve scripting API.
 
-This is the same pattern as the AIRTA Command Center's embedded API server:
+The local-only architecture is:
     Agent <--HTTP--> This server (inside Resolve) <--Resolve API--> DaVinci Resolve
 
 The server stays running in a background thread until you stop it.
