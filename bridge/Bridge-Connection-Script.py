@@ -2269,7 +2269,6 @@ class BridgeHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             parsed = urlparse(self.path)
-            print("[Resolve Bridge] DEBUG: do_GET path='" + parsed.path + "'")
             if parsed.path == "/health" or parsed.path == "/alive":
                 self._send_json(200, {"status": "ok"})
                 return
@@ -2327,10 +2326,9 @@ class BridgeHandler(BaseHTTPRequestHandler):
                 pass
 
     def log_message(self, format, *args):
-        try:
-            print("[Resolve Bridge] " + (format % args))
-        except:
-            pass
+        # Printing from a request thread can deadlock Workflow Integration's
+        # fuscript stdout relay. Request logging is intentionally suppressed.
+        return
 
 # ── Start server ─────────────────────────────────────────────────────────────
 
