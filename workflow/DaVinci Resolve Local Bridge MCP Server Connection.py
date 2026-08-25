@@ -1,4 +1,4 @@
-"""Resolve Workflow Integration launcher for the AIRTA MCP bridge."""
+"""Workflow Integration launcher for DaVinci Resolve Local Bridge MCP."""
 
 import json
 import os
@@ -10,7 +10,7 @@ import urllib.request
 HOST = "127.0.0.1"
 PORT = 8787
 BASE_URL = "http://%s:%d" % (HOST, PORT)
-WINDOW_ID = "net.airta.resolve.bridge.launcher"
+WINDOW_ID = "io.github.resolve.local.bridge.mcp.connection"
 
 
 def _bridge_path():
@@ -41,7 +41,7 @@ def _launch_bridge():
     path = _bridge_path()
     if not os.path.isfile(path):
         raise RuntimeError("Bridge script not found: " + path)
-    runpy.run_path(path, run_name="__airta_resolve_bridge__")
+    runpy.run_path(path, run_name="__davinci_resolve_local_bridge__")
 
 
 try:
@@ -59,7 +59,7 @@ else:
     win = dispatcher.AddWindow(
         {
             "ID": WINDOW_ID,
-            "WindowTitle": "AIRTA Resolve Bridge",
+            "WindowTitle": "DaVinci Resolve Local Bridge MCP Server Connection",
             "Geometry": [1120, 80, 420, 135],
             "StyleSheet": "QWidget { background: #171923; color: #f7fafc; } "
                           "QPushButton { background: #5865F2; border: 0; border-radius: 6px; "
@@ -67,7 +67,7 @@ else:
                           "QPushButton:hover { background: #4A9EFF; }",
         },
         ui.VGroup([
-            ui.Label({"ID": "Status", "Text": _status_text(), "ToolTip": "AIRTA Resolve MCP bridge status"}),
+            ui.Label({"ID": "Status", "Text": _status_text(), "ToolTip": "DaVinci Resolve Local Bridge MCP status"}),
             ui.HGroup([
                 ui.Button({"ID": "Start", "Text": "Start Bridge"}),
                 ui.Button({"ID": "Stop", "Text": "Stop Bridge"}),
@@ -82,7 +82,7 @@ else:
 
     def start(_event=None):
         if _status_text() == "Stopped":
-            threading.Thread(target=_launch_bridge, name="AIRTAResolveBridge", daemon=True).start()
+            threading.Thread(target=_launch_bridge, name="DaVinciResolveLocalBridge", daemon=True).start()
         win.Find("Status").Text = "Starting..."
 
     def stop(_event=None):
