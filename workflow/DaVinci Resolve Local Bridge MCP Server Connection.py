@@ -122,3 +122,4 @@ else:
     win.On[WINDOW_ID].Close = close
     win.Show()
     dispatcher.RunLoop()
+    win.Hide()
