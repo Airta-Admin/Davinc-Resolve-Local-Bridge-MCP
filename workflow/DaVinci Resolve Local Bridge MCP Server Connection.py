@@ -4,6 +4,7 @@ import json
 import os
 import runpy
 import sys
+import time
 import traceback
 import urllib.request
 import webbrowser
@@ -56,6 +57,16 @@ def _status_text():
             return "Running on %s (%d actions)" % (BASE_URL, len(actions.get("actions", [])))
     except Exception:
         pass
+    return "Stopped"
+
+
+def _wait_for_running(timeout=3.0):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        status = _status_text()
+        if status != "Stopped":
+            return status
+        time.sleep(0.1)
     return "Stopped"
 
 
@@ -139,7 +150,7 @@ else:
         win.Find("Status").Text = "Starting..."
         try:
             _launch_bridge()
-            status = _status_text()
+            status = _wait_for_running()
             if status == "Stopped":
                 raise RuntimeError("Bridge script returned but the health endpoint did not respond")
             win.Find("Status").Text = status
