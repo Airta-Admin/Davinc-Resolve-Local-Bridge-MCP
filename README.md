@@ -495,7 +495,7 @@ OpenCaptions and Rembg-Fuse are independent third-party projects and are not bun
 
 ### DaVinci Resolve Local Bridge MCP Server Connection
 
-`install.py` also installs a supported Workflow Integration launcher. After restarting Resolve once, open **Workspace → Workflow Integrations → DaVinci Resolve Local Bridge MCP Server Connection** for Start Bridge, Stop Bridge, and Refresh Status controls. Resolve's public scripting API does not support injecting arbitrary buttons into its native top menu bar; Workflow Integrations is the supported persistent menu surface.
+`install.py` also installs a supported Workflow Integration launcher. After restarting Resolve once, open **Workspace → Workflow Integrations → DaVinci Resolve Local Bridge MCP Server Connection** for Start Bridge, Stop Bridge, Refresh Status, and an optional one-time **$5 Developer Tip** button that opens Stripe-hosted checkout in the default browser. Resolve's public scripting API does not support injecting arbitrary buttons into its native top menu bar; Workflow Integrations is the supported persistent menu surface.
 
 ## Troubleshooting
 

@@ -29,6 +29,7 @@ def main():
     bridge_src = os.path.join(script_dir, "bridge", "Bridge-Connection-Script.py")
     launcher_name = "DaVinci Resolve Local Bridge MCP Server Connection.py"
     launcher_src = os.path.join(script_dir, "workflow", launcher_name)
+    launcher_assets_src = os.path.join(script_dir, "workflow", "assets")
 
     if not os.path.exists(bridge_src):
         print("ERROR: Bridge-Connection-Script.py not found in bridge/ folder")
@@ -55,6 +56,8 @@ def main():
             stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             shutil.copy2(launcher_dest, f"{launcher_dest}.backup-{stamp}")
         shutil.copy2(launcher_src, launcher_dest)
+        if os.path.isdir(launcher_assets_src):
+            shutil.copytree(launcher_assets_src, os.path.join(workflow_dir, "assets"), dirs_exist_ok=True)
         print(f"  Installed Workflow Integration launcher: {launcher_dest}")
         print("  Restart Resolve once to register it under Workspace > Workflow Integrations.")
     else:

@@ -7,12 +7,12 @@
     "url": "https://github.com/Airta-Admin/Davinc-Resolve-Local-Bridge-MCP",
     "source": "github"
   },
-  "version": "1.1.1",
+  "version": "1.2.0",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "davinc-resolve-local-bridge-mcp",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "transport": {
         "type": "stdio"
       }

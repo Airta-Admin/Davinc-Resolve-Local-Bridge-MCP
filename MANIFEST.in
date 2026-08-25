@@ -1,3 +1,4 @@
 include install.py
 recursive-include bridge *.py
 recursive-include workflow *.py
+recursive-include workflow/assets *.png
