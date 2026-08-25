@@ -497,6 +497,19 @@ OpenCaptions and Rembg-Fuse are independent third-party projects and are not bun
 
 `install.py` also installs a supported Workflow Integration launcher. After restarting Resolve once, open **Workspace → Workflow Integrations → DaVinci Resolve Local Bridge MCP Server Connection** for Start Bridge, Stop Bridge, Refresh Status, and an optional one-time **$5 Developer Tip** button that opens Stripe-hosted checkout in the default browser. Resolve's public scripting API does not support injecting arbitrary buttons into its native top menu bar; Workflow Integrations is the supported persistent menu surface.
 
+### Support development
+
+<p align="center">
+  <a href="https://buy.stripe.com/9B6eVd3vP3Et5465MI7bW05">
+    <img src="workflow/assets/tip-jar.png" alt="Tip jar" width="150">
+  </a>
+</p>
+
+<p align="center">
+  <strong><a href="https://buy.stripe.com/9B6eVd3vP3Et5465MI7bW05">Leave an optional one-time $5 developer tip</a></strong><br>
+  Secure checkout is hosted by Stripe. A tip supports continued development and maintenance of this open-source bridge; it is not a charitable donation or tax-deductible contribution.
+</p>
+
 ## Troubleshooting
 
 ### Bridge won't start
