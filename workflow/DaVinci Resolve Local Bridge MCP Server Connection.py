@@ -102,6 +102,7 @@ else:
                 ui.Label({"Text": "Local endpoint: " + BASE_URL}),
             ]),
             ui.VGroup({"ID": "TipPanel", "Weight": 1}, [
+                ui.VGap(32),
                 ui.Button({
                     "ID": "TipButton",
                     "Text": "$5 Developer Tip",
