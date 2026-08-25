@@ -1,0 +1,3 @@
+include install.py
+recursive-include bridge *.py
+recursive-include workflow *.py

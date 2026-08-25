@@ -1833,6 +1833,69 @@ def api_fusion_render_comp():
     comp.Render()
     return {"status": "ok"}
 
+
+# ── Optional open-source extensions ─────────────────────────────────────────
+
+def api_get_extension_status():
+    """Report supported optional extensions without loading or executing them."""
+    appdata = os.environ.get("APPDATA", "")
+    programdata = os.environ.get("PROGRAMDATA", r"C:\ProgramData")
+    roots = [
+        os.path.join(programdata, "Blackmagic Design", "DaVinci Resolve", "Fusion"),
+        os.path.join(appdata, "Blackmagic Design", "DaVinci Resolve", "Support", "Fusion"),
+    ]
+    candidates = {
+        "open_captions": [
+            os.path.join(root, "Scripts", "Comp", "OpenCaptions.py") for root in roots
+        ],
+        "rembg_fuse": [
+            os.path.join(root, "Fuses", "Rembg", "Rembg.fuse") for root in roots
+        ],
+    }
+    extensions = {}
+    for name, paths in candidates.items():
+        installed_paths = [path for path in paths if os.path.isfile(path)]
+        extensions[name] = {
+            "installed": bool(installed_paths),
+            "paths": installed_paths,
+        }
+    return {"status": "ok", "extensions": extensions}
+
+
+def api_open_captions_list_templates():
+    """List Text+ clips in the OpenCaptions 'Captions Templates' media folder."""
+    if not resolve: _connect()
+    proj = project_manager.GetCurrentProject()
+    if not proj: return {"status": "error", "message": "No project open"}
+    media_pool = proj.GetMediaPool()
+    root = media_pool.GetRootFolder()
+    folder = None
+    for subfolder in root.GetSubFolderList() or []:
+        if subfolder.GetName() == "Captions Templates":
+            folder = subfolder
+            break
+    if not folder:
+        return {"status": "ok", "templates": [], "message": "Captions Templates folder not found"}
+    templates = []
+    for clip in folder.GetClipList() or []:
+        name = clip.GetClipProperty("Clip Name")
+        if name:
+            templates.append(name)
+    return {"status": "ok", "templates": sorted(set(templates))}
+
+
+def api_fusion_add_rembg_node(name="Rembg"):
+    """Add the installed Rembg-Fuse node to the current Fusion composition."""
+    if not resolve: _connect()
+    fu = resolve.Fusion()
+    comp = fu.GetCurrentComp() if fu else None
+    if not comp: return {"status": "error", "message": "No Fusion composition open"}
+    tool = comp.AddTool("Rembg", -1, False)
+    if not tool:
+        return {"status": "error", "message": "Rembg node unavailable; install Rembg-Fuse and restart Resolve"}
+    tool.SetAttrs({"TOOLS_Name": name})
+    return {"status": "ok", "name": name, "tool_id": "Rembg"}
+
 # ── Gallery actions ───────────────────────────────────────────────────────────
 
 def api_get_gallery_still_albums():
@@ -2166,6 +2229,10 @@ ACTIONS = {
     "fusion_set_input": api_fusion_set_input,
     "fusion_get_input": api_fusion_get_input,
     "create_hand_animation": api_create_hand_animation,
+    # Optional open-source extensions
+    "get_extension_status": api_get_extension_status,
+    "open_captions_list_templates": api_open_captions_list_templates,
+    "fusion_add_rembg_node": api_fusion_add_rembg_node,
     # Gallery
     "get_gallery_still_albums": api_get_gallery_still_albums,
     "get_gallery_powergrade_albums": api_get_gallery_powergrade_albums,

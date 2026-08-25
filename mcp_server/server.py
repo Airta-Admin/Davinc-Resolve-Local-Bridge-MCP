@@ -8,7 +8,7 @@ Architecture:
     Agent <--MCP--> This Server <--HTTP--> Resolve Bridge (inside Resolve) <--Resolve API--> DaVinci Resolve
 
 The Resolve Bridge script must be running inside DaVinci Resolve first:
-    Workspace > Scripts > Bridge-Connection-Script
+    Workspace > Scripts > DaVinciResolveBridge
 
 Usage:
     python -m resolve_mcp.server          # stdio transport (default)
@@ -98,7 +98,7 @@ logger.info(f"MCP SDK version: {_mcp_version} (major={_mcp_major}, v2={_IS_MCP_V
 # Any action not listed here gets a generic description.
 
 ACTION_DESCRIPTIONS = {
-    "status": "Check if DaVinci Resolve bridge is running and get current project/timeline info. Always call this first to verify connectivity. The bridge script must be running inside Resolve via Workspace > Scripts > Bridge-Connection-Script.",
+    "status": "Check if DaVinci Resolve bridge is running and get current project/timeline info. Always call this first to verify connectivity. The bridge script must be running inside Resolve via Workspace > Scripts > DaVinciResolveBridge.",
     "get_version": "Get DaVinci Resolve version information.",
     "get_current_page": "Get the currently active page in DaVinci Resolve.",
     "open_page": "Switch to a specific page in DaVinci Resolve. Pages: edit, fusion, color, deliver, media, cut, fairlight.",
@@ -132,6 +132,9 @@ ACTION_DESCRIPTIONS = {
     "fusion_get_input": "Get an input value from a Fusion node.",
     "fusion_get_tool_list": "List all tools/nodes in the current Fusion composition.",
     "fusion_set_current_frame": "Set the current frame in the Fusion composition.",
+    "get_extension_status": "Read-only check for supported optional Resolve extensions, currently OpenCaptions and Rembg-Fuse.",
+    "open_captions_list_templates": "List Text+ clips in the OpenCaptions 'Captions Templates' media-pool folder.",
+    "fusion_add_rembg_node": "Add the installed Rembg-Fuse background-removal node to the current Fusion composition.",
     "generate_speech": "Generate speech audio using DaVinci Resolve's AI speech generation.",
     "create_subtitles_from_audio": "Auto-generate subtitles from timeline audio.",
     "detect_scene_cuts": "Detect and create scene cuts along the timeline.",
@@ -162,7 +165,7 @@ def _build_tools():
         tools.append(Tool(
             name="resolve_health",
             description="Check if DaVinci Resolve bridge is running. The bridge script must be "
-                        "running inside Resolve via Workspace > Scripts > Bridge-Connection-Script. "
+                        "running inside Resolve via Workspace > Scripts > DaVinciResolveBridge. "
                         "If this returns an error, the bridge is not running.",
             inputSchema={"type": "object", "properties": {}, "required": []},
         ))
@@ -225,7 +228,7 @@ async def _handle_call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=json.dumps({
             "status": "error",
             "message": "Could not connect to Resolve Bridge. Make sure the bridge script is running "
-                       "inside DaVinci Resolve via Workspace > Scripts > Bridge-Connection-Script",
+                       "inside DaVinci Resolve via Workspace > Scripts > DaVinciResolveBridge",
         }))]
     except Exception as e:
         return [TextContent(type="text", text=json.dumps({"status": "error", "message": str(e)}))]
@@ -261,6 +264,11 @@ async def main():
         await server.run(read_stream, write_stream, server.create_initialization_options())
 
 
-if __name__ == "__main__":
+def run():
+    """Console-script entry point."""
     import asyncio
     asyncio.run(main())
+
+
+if __name__ == "__main__":
+    run()
