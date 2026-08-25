@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "davinc-resolve-local-bridge-mcp"
-version = "1.2.2"
+version = "1.2.3"
 description = "Control DaVinci Resolve from any AI assistant. 218 MCP tools covering the Resolve API and optional extensions."
 readme = "README.md"
 license = "MIT"
@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies = [
-    "mcp>=1.0.0,<3.0.0",
+    "mcp>=1.0.0,<2.0.0",
     "requests>=2.28.0",
 ]
 
