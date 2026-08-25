@@ -493,6 +493,10 @@ All item actions accept optional `trackType`, `trackIndex`, `itemIndex` to targe
 
 OpenCaptions and Rembg-Fuse are independent third-party projects and are not bundled with this package.
 
+### AIRTA Resolve Bridge launcher
+
+`install.py` also installs a supported Workflow Integration launcher. After restarting Resolve once, open **Workspace → Workflow Integrations → AIRTA Resolve Bridge** for Start Bridge, Stop Bridge, and Refresh Status controls. Resolve's public scripting API does not support injecting arbitrary buttons into its native top menu bar; Workflow Integrations is the supported persistent menu surface.
+
 ## Troubleshooting
 
 ### Bridge won't start

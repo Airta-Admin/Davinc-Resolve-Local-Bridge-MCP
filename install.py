@@ -27,9 +27,13 @@ def get_resolve_scripts_dir():
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     bridge_src = os.path.join(script_dir, "bridge", "Bridge-Connection-Script.py")
+    launcher_src = os.path.join(script_dir, "workflow", "AIRTA Resolve Bridge.py")
 
     if not os.path.exists(bridge_src):
         print("ERROR: Bridge-Connection-Script.py not found in bridge/ folder")
+        sys.exit(1)
+    if not os.path.exists(launcher_src):
+        print("ERROR: AIRTA Resolve Bridge.py not found in workflow/ folder")
         sys.exit(1)
 
     scripts_dir = get_resolve_scripts_dir()
@@ -37,6 +41,23 @@ def main():
     print("=" * 60)
     print("Davinc-Resolve-Local-Bridge-MCP - Installation")
     print("=" * 60)
+    print()
+
+    # Step 1b: Install the supported Workspace > Workflow Integrations launcher.
+    workflow_dir = os.path.join(
+        os.environ.get("PROGRAMDATA", os.path.expanduser("~")),
+        "Blackmagic Design", "DaVinci Resolve", "Support", "Workflow Integration Plugins"
+    ) if platform.system() == "Windows" else scripts_dir
+    if os.path.isdir(workflow_dir):
+        launcher_dest = os.path.join(workflow_dir, "AIRTA Resolve Bridge.py")
+        if os.path.exists(launcher_dest):
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            shutil.copy2(launcher_dest, f"{launcher_dest}.backup-{stamp}")
+        shutil.copy2(launcher_src, launcher_dest)
+        print(f"  Installed Workflow Integration launcher: {launcher_dest}")
+        print("  Restart Resolve once to register it under Workspace > Workflow Integrations.")
+    else:
+        print(f"  WARNING: Workflow Integration directory not found: {workflow_dir}")
     print()
 
     # Step 1: Copy bridge script
