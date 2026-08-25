@@ -524,4 +524,4 @@ MIT License — see [LICENSE](LICENSE) file.
 
 ## Credits
 
-Created by [The Geek Gods](https://github.com/geekgodtech). Inspired by the DaVinci Resolve scripting community.
+Created by: A Fellow Coder for fellow coders. Inspired by the DaVinci Resolve scripting community.
