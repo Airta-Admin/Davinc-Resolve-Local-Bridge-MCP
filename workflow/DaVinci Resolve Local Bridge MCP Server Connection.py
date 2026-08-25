@@ -2,7 +2,7 @@
 
 import json
 import os
-import runpy
+import subprocess
 import sys
 import time
 import traceback
@@ -44,6 +44,20 @@ def _bridge_path():
     )
 
 
+def _fuscript_path():
+    candidates = [
+        os.path.join(
+            os.environ.get("PROGRAMFILES", "C:\\Program Files"),
+            "Blackmagic Design", "DaVinci Resolve", "fuscript.exe",
+        ),
+        "fuscript.exe",
+    ]
+    for path in candidates:
+        if path == "fuscript.exe" or os.path.isfile(path):
+            return path
+    return candidates[-1]
+
+
 def _request(path, timeout=2):
     with urllib.request.urlopen(BASE_URL + path, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
@@ -74,20 +88,21 @@ def _launch_bridge():
     path = _bridge_path()
     if not os.path.isfile(path):
         raise RuntimeError("Bridge script not found: " + path)
-    host_resolve = fusion.GetResolve()
-    if not host_resolve:
+    if not fusion.GetResolve():
         raise RuntimeError("Workflow Integration could not obtain the live Resolve object")
-    runpy.run_path(
-        path,
-        run_name="__davinci_resolve_local_bridge__",
-        init_globals={
-            "fusion": fusion,
-            "fu": fusion,
-            "resolve": host_resolve,
-            "bmd": bmd,
-            "RESOLVE_BRIDGE_BACKGROUND": True,
-        },
+    process = subprocess.Popen(
+        [_fuscript_path(), path],
+        cwd=os.path.dirname(path),
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        close_fds=True,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
     )
+    time.sleep(0.15)
+    if process.poll() is not None:
+        raise RuntimeError("fuscript exited before the bridge became ready (exit code %s)" % process.returncode)
+    return process
 
 
 try:
