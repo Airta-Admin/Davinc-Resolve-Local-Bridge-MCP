@@ -387,15 +387,15 @@ def api_create_hand_animation(shape="circle", duration_frames=40, hand_image_pat
 
     # Step 2: Background node with alpha = 0
     bg = comp.AddTool("Background", -1, False)
-    bg.SetAttrs("TOOLS_Name", "HandDrawBG")
+    bg.SetAttrs({"TOOLS_Name": "HandDrawBG"})
     bg.SetInput("Alpha", 0.0)
     results.append("Created Background node 'HandDrawBG' with alpha=0")
 
     # Step 3: Paint node with polyline stroke
     paint1 = comp.AddTool("Paint", -1, False)
-    paint1.SetAttrs("TOOLS_Name", "HandDrawStroke")
+    paint1.SetAttrs({"TOOLS_Name": "HandDrawStroke"})
     # Connect background to paint input
-    paint1.SetInput("Input", bg, "Output")
+    paint1.Input = bg.Output
     results.append("Created Paint node 'HandDrawStroke'")
 
     # Set up the stroke - use polyline mode
@@ -404,7 +404,7 @@ def api_create_hand_animation(shape="circle", duration_frames=40, hand_image_pat
 
     # Step 5: Keyframe WriteOnEnd
     # At frame 0, WriteOnEnd = 0
-    comp.SetCurrentFrame(0)
+    comp.CurrentTime = 0
     paint1.SetInput("WriteOnEnd", 0.0)
     # Set keyframe by setting the input with time
     paint1.SetInput("WriteOnEnd", 0.0, 0)  # frame 0
@@ -415,8 +415,8 @@ def api_create_hand_animation(shape="circle", duration_frames=40, hand_image_pat
 
     # Step 6: Duplicate the paint node
     paint2 = comp.AddTool("Paint", -1, False)
-    paint2.SetAttrs("TOOLS_Name", "HandDrawImage")
-    paint2.SetInput("Input", paint1, "Output")
+    paint2.SetAttrs({"TOOLS_Name": "HandDrawImage"})
+    paint2.Input = paint1.Output
     results.append("Created second Paint node 'HandDrawImage'")
 
     # Step 7: Set brush to Image mode
@@ -450,7 +450,7 @@ def api_create_hand_animation(shape="circle", duration_frames=40, hand_image_pat
             media_out = tool
             break
     if media_out:
-        media_out.SetInput("Input", paint2, "Output")
+        media_out.Input = paint2.Output
         results.append("Connected HandDrawImage to MediaOut")
 
     results.append("NOTE: You need to manually draw the polyline shape on the viewer")
@@ -467,13 +467,18 @@ def api_list_timelines():
     if not proj:
         return {"status": "error", "message": "No project open"}
     timelines = []
+    current_timeline = proj.GetCurrentTimeline()
+    current_name = current_timeline.GetName() if current_timeline else None
     for i in range(proj.GetTimelineCount()):
         tl = proj.GetTimelineByIndex(i + 1)
         timelines.append({
             "name": tl.GetName(),
             "start_frame": tl.GetStartFrame() if hasattr(tl, 'GetStartFrame') else None,
             "end_frame": tl.GetEndFrame() if hasattr(tl, 'GetEndFrame') else None,
-            "is_current": proj.GetCurrentTimeline() == tl,
+            # Resolve returns a fresh Python proxy for the same timeline on some
+            # calls, so object equality is unreliable. Timeline names are the
+            # stable value exposed by the public scripting API.
+            "is_current": bool(current_name and tl.GetName() == current_name),
         })
     return {"status": "ok", "timelines": timelines}
 
@@ -1743,7 +1748,7 @@ def api_fusion_set_current_frame(frame):
     fu = resolve.Fusion()
     comp = fu.GetCurrentComp()
     if not comp: return {"status": "error", "message": "No Fusion composition open"}
-    comp.SetCurrentFrame(frame)
+    comp.CurrentTime = frame
     return {"status": "ok", "frame": frame}
 
 def api_fusion_get_current_frame():
@@ -1753,10 +1758,10 @@ def api_fusion_get_current_frame():
         comp = fu.GetCurrentComp()
     except:
         return {"status": "error", "message": "No Fusion composition open"}
-    if not comp or not hasattr(comp, 'GetCurrentFrame'):
+    if not comp:
         return {"status": "error", "message": "No Fusion composition open"}
     try:
-        return {"status": "ok", "frame": comp.GetCurrentFrame()}
+        return {"status": "ok", "frame": comp.CurrentTime}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
